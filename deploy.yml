@@ -1,0 +1,74 @@
+data:
+  AzureWebJobsStorage: RGVmYXVsdEVuZHBvaW50c1Byb3RvY29sPWh0dHBzO0FjY291bnROYW1lPXN0b3JhZ2VhY2NvdW50azhzODUwMztBY2NvdW50S2V5PWJ0S09NYWE0QUhnRExEVndkNTRvcEo0SHBFRDdEVGpONHljVW1EZ3J0c25uMGZ0c3NVYkFkd3l6a0R5eHl4cThtU3VhMHkrNC9BbjYrRmxvQ3A2TmRRPT07RW5kcG9pbnRTdWZmaXg9Y29yZS53aW5kb3dzLm5ldA==
+  FUNCTIONS_WORKER_RUNTIME: ZG90bmV0
+  Environment: bG9jYWw=
+apiVersion: v1
+kind: Secret
+metadata:
+  name: queuefunction290703
+  namespace: keda
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queuefunction290703
+  namespace: keda
+  labels:
+    app: queuefunction290703
+spec:
+  selector:
+    matchLabels:
+      app: queuefunction290703
+  template:
+    metadata:
+      labels:
+        app: queuefunction290703
+    spec:
+      containers:
+      - name: queuefunction290703
+        image: target2021.azurecr.io/queuefunction290701
+        env:
+        - name: AzureFunctionsJobHost__functions__0
+          value: QueueTrigger
+        envFrom:
+        - secretRef:
+            name: queuefunction290703
+        readinessProbe:
+          failureThreshold: 3
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 240
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+        startupProbe:
+          failureThreshold: 3
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 240
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: queuefunction290703
+  namespace: keda
+  labels: {}
+spec:
+  scaleTargetRef:
+    name: queuefunction290703
+    #minReplicaCount: 0
+    #maxReplicaCount: 10
+    #pollingInterval: 1    
+    #messageCount: '1'
+  triggers:
+  - type: azure-queue
+    metadata:
+      queueName: myqueue
+      connectionFromEnv: AzureWebJobsStorage
+---
+
