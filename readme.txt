@@ -2,7 +2,7 @@ Azure Function running on Kubernetes with KEDA
 	Follow  following link to install KEDA and Azure Function in your kubernetes cluster
 	#Link - https://microsoft.github.io/AzureTipsAndTricks/blog/tip278.html
 	
-	Step 1: Build Function Image
+	Step 1: Build Function Image and push to your image repository (Azure Container Registry or DockerHub)
 	docker build -t imagerepositoryusername/imagename .
 	
 	Step 2: Generate Deployment yaml File
